@@ -1,0 +1,31 @@
+.wrapper {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.application-content {
+  width: 100%;
+  height: 100%;
+}
+
+.application-wrapper {
+  @include mobileLayout($mobile-layout-variable) {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+  width: 92%;
+  min-width: 320px;
+  height: 97.5%;
+}
+
+.application-content {
+  @include mobileLayout($mobile-layout-variable) {
+    display: inline-block;
+    width: 360px;
+    height: 520px;
+  }
+  min-width: 320px;
+}

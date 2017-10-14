@@ -1,0 +1,14 @@
+// variables, mixins import
+@import "utils/_variables",
+        "utils/_mixins";
+
+// reset, base style import
+@import "base/_reset",
+        "base/_base";
+
+// layout style import
+@import "layout/_app";
+
+// components style import
+@import "components/_calculator",
+        "components/_buttons.scss";
