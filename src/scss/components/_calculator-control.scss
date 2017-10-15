@@ -1,0 +1,96 @@
+.calculator-controller {
+  position: absolute;
+  top: 12px;
+
+  &:hover {
+    .window-control {
+      &:after {
+          opacity: 1;
+      }
+    }
+  }
+}
+
+.window-control {
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: 5px;
+  border: 0;
+  border-radius: 8px;
+  outline: none;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 0;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    margin: auto;
+    border-radius: 8px;
+    background: radial-gradient(circle at 50% 0, rgba(#fff, 0.5), rgba(#fff, 0) 70%),
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    transition: opacity 100ms;
+    opacity: 0;
+  }
+
+  &.close {
+    @include control-button-style(#f22);
+
+    &:after {
+      $close-icon-color: rgba(#000, 0.4);
+
+      width: 2px;
+      height: 2px;
+      background-color: $close-icon-color;
+      top: 50%;
+      left: 50%;
+      margin-top: -3px;
+      margin-left: -3px;
+      box-shadow: 1px 1px 0 0 $close-icon-color, 2px 2px 0 0 $close-icon-color, 3px 3px 0 0 $close-icon-color, 4px 4px 0 0 $close-icon-color,
+      4px 0px 0 0 $close-icon-color, 3px 1px 0 0 $close-icon-color, 2px 2px 0 0 $close-icon-color, 1px 3px 0 0 $close-icon-color, 0px 4px 0 0 $close-icon-color;
+    }
+  }
+
+  &.minimize {
+    @include control-button-style(#f7bf67);
+
+    &:after {
+      top: 50%;
+      right: 0;
+      left: 0;
+      width: 7px;
+      margin: -1px auto 0;
+      border-top: 2px solid rgba(#000, 0.5);
+    }
+  }
+
+  &.maximize {
+    @include control-button-style(#89cb5a);
+
+    &:after {
+      $maximize-icon-color: rgba(#000, 0.4);
+
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 2px;
+      margin-top: -4px;
+      margin-left: -4px;
+      box-shadow: 4px 0px 0 0 $maximize-icon-color, 6px 0px 0 0 $maximize-icon-color, 6px 2px 0 0 $maximize-icon-color,
+      0px 4px 0 0 $maximize-icon-color, 0px 6px 0 0 $maximize-icon-color, 2px 6px 0 0 $maximize-icon-color;
+    }
+  }
+}

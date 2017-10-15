@@ -1,5 +1,11 @@
 html, body {
   height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #eee;
+  background: linear-gradient(#bbb, #eee, #aaa);
 }
 
 button {
@@ -13,12 +19,4 @@ button {
   margin: -1px;
   width: 1px;
   height: 1px;
-}
-
-.m-t-minus2 {
-  margin-top: -21% !important;
-}
-
-.m-l-0 {
-  margin-left: 0 !important;
 }

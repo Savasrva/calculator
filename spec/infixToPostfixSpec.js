@@ -64,8 +64,8 @@ function postfixCalculator(postfixExpression) {
   return resultStack[0];
 }
 
-describe('transfer', function() {
-  it('toPostfix', function() {
+describe('infix to postfix', function() {
+  it('중위표기법에서 후위표기법으로 반환된다', function() {
     expect(infixToPostfix(['1', '+', '2', '*', '3'])).toEqual(['1', '2', '3', '*', '+']);
     expect(infixToPostfix(['1', '+', '2', '-', '3'])).toEqual(['1', '2', '+', '3', '-']);
     expect(infixToPostfix(['1', '+', '2', '-', '3', '*', '4'])).toEqual(['1', '2', '+', '3', '4', '*', '-']);
@@ -76,7 +76,7 @@ describe('transfer', function() {
 
 
 describe('calculate', function() {
-  it('execute', function() {
+  it('후위표기법으로 된 수식을 계산한다', function() {
     expect(postfixCalculator(infixToPostfix(['1', '+', '2', '*', '3']))).toEqual(7);
     expect(postfixCalculator(infixToPostfix(['4', '/', '2', '*', '3', '+', '4', '*', '5']))).toEqual(26);
   });

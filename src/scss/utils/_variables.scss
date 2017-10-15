@@ -1,1 +1,20 @@
-$mobile-layout-variable: 480px;
+$breakpoint-pc: 480px;
+
+$color-main: #333;
+$color-sub: lighten(#333, 6.5%);
+
+$calculator-min-width: 320px;
+$calculator-min-height: 500px;
+$calculator-inner-margin: 15px;
+
+$result-window-top: 40px;
+$result-window-height: 75px;
+$result-window-margin-bottom: 20px;
+
+$calculator-padding-top: $result-window-top + $result-window-height + $result-window-margin-bottom;
+
+$calculator-btn-padding: 5px;
+$calculator-btn-list-min-height: $calculator-min-height - $calculator-padding-top - $calculator-btn-padding;
+
+$calculator-minimized-duration: 0.5s;
+$calculator-minimized-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
