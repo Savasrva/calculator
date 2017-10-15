@@ -7,39 +7,47 @@
   
     var stack = [],
       current = [],
-      showExpression,
+      result = '',
+      containerId = containerId,
       frag;
-  
-    showExpression = function(element, value1, value2) {
-      element.innerHTML = value1 || value2 ? value1 + utils.numberFormat(value2) : '0';
-    }
 
-    this.containerId = containerId;
+    this.stack = stack;
+    this.current = current;
+    this.setResult = function(value) {
+      result = value;
+    };
+    this.getResult = function() {
+      return result;
+    }
+    this.getContainerId = function() {
+      return containerId;
+    }
+    this.showExpression = function(element, numberFormat, value1, value2) {
+      var val = value1 || value2 ? value1 + value2 : '0';
+      element.innerHTML = numberFormat(val);
+    }
     frag = document.createDocumentFragment();
-    frag.appendChild(this.domFactory({
-      stack: stack,
-      current: current,
-      elements: ele,
-      utils: utils,
-      showExpression: showExpression
-    }));
+    frag.appendChild(this.domFactory(this.elements));
   
-    document.getElementById(containerId).appendChild(frag);
+    document.getElementById(this.getContainerId()).appendChild(frag);
   };
   
-  Calculator.prototype.domFactory = function(args) {
-    var props = args.elements.element.split('.'),
-      utils = args.utils,
+  Calculator.prototype.elements = ele;
+  Calculator.prototype.utils = utils;
+
+  Calculator.prototype.domFactory = function(elements) {
+    var props = elements.element.split('.'),
+      utils = this.utils,
       elementName = props[0],
       className = props[utils.arrayIndexOf(props, 'class=')],
       type = props[utils.arrayIndexOf(props, 'type=')],
       content = props[utils.arrayIndexOf(props, 'content=')],
       dom,
-      items = args.elements.items,
-      event = args.elements.event,
-      value = args.elements.value,
-      addEvent = utils.eventHandler.event,
-      click = utils.eventHandler.name,
+      items = elements.items,
+      event = elements.event,
+      value = elements.value,
+      addEvent = this.utils.eventHandler.event,
+      click = this.utils.eventHandler.name,
       i = 0,
       length = 0,
       self = this;
@@ -49,87 +57,92 @@
     if (type) dom.setAttribute('type', type.split('=')[1]);
     if (content) dom.innerHTML = content.split('=')[1];
     if (className === 'class=expression') {
-      args.showExpression = args.showExpression.curry(dom);
-      args.showExpression();
+      this.showExpression = this.showExpression.curry(dom, utils.numberFormat);
+      this.showExpression();
     }
     if (event) {
       dom[addEvent](click, function() {
-        console.log(event);
-        self[event](args.stack, args.current, args.showExpression, value);
+        self[event](value);
       });
     }
     if (items) {
       for (i = 0, length = items.length; i < length; i++) {
-        args.elements = items[i]; //엘리먼트 교체
-        dom.appendChild(this.domFactory(args));
+        dom.appendChild(this.domFactory(items[i]));
       }
     }
   
     return dom;
   };
   
-  Calculator.prototype.calculate = function(stack, current, showExpression, value) {
+  Calculator.prototype.calculate = function(value) {
+    var stack = this.stack,
+      current = this.current;
     if (stack.length < 2 && current.length > 0) { return false; }
     if (current[0] === value) {
-      stack.splice(0, 0, this.result);
+      stack.splice(0, 0, this.getResult());
     }
     if (current.length > 0) {
       if (current.join('') !== '=') { stack.push(current.join('')); }
       current.length = 0;
     }
     if (isNaN(stack[stack.length-1].replace(',', ''))) { stack.pop(); }
-    current.push(value);
-    this.result = utils.limitDecimalPoint(this.postfixCalculate(this.infixToPostfix(stack)));
 
-    showExpression('', this.result);
+    current.push(value);
+    this.setResult( utils.limitDecimalPoint(this.postfixCalculate(this.infixToPostfix(stack))) );
+    this.showExpression('', this.getResult());
     while (stack.length > 2) {
       stack.shift();
     }
   };
   
-  Calculator.prototype.addOperator = function(stack, current, showExpression, value) {
-    var sLastIndex = stack.length - 1;
+  Calculator.prototype.addOperator = function(value) {
+    var stack = this.stack,
+      current = this.current;
     if (current.length === 0) { return false; }
-    if (typeof stack[sLastIndex] === 'number' && current.length === 0) {
+    if (typeof stack[stack.length-1] === 'number' && current.length === 0) {
       stack[sLastIndex] = value;
     }
     if (utils.arrayIndexOf(current, '=') > -1) {
       stack.length = 0;
       current.length = 0;
-      stack.push(this.result);
+      stack.push(this.getResult());
       stack.push(value);
     }
     if (current.join('')) {
-      stack.push(utils.numberFormat(current.join('')));
+      stack.push(current.join(''));
       stack.push(value);
       current.length = 0;
     }
-    showExpression(stack.join(''), current.join(''));
+    this.showExpression(stack.join(''), current.join(''));
   };
   
-  Calculator.prototype.addOperand = function(stack, current, showExpression, value) {
-    var cur = current.join('');
+  Calculator.prototype.addOperand = function(value) {
+    var stack = this.stack,
+      current = this.current, 
+      cur = current.join('');
     if (current.length === 0 && value === '0' && stack.length === 0
       || current.length === 1 && current[0] === '0' && value === '0') {
       return false;
     }
-    if (utils.isLimit(cur) || utils.isLimitDecimalPointLength(cur)) { return false; }
-    if (utils.arrayIndexOf(current, '.') > -1 && value === '.') { return false; }
-    if (current.length === 1 && current[0] === '0' && value !== '.') { current.shift(); }
-    if (current.length === 0 && value === '.') { current.push('0'); }
     if (current[0] === '=') {
       stack.length = 0;
       current.length = 0;
     }
+    if (utils.isLimit(cur) || utils.isLimitDecimalPointLength(cur)) { return false; }
+    if (utils.arrayIndexOf(current, '.') > -1 && value === '.') { return false; }
+    if (current.length === 1 && current[0] === '0' && value !== '.') { current.shift(); }
+    if (current.length === 0 && value === '.') {current.push('0');}
 
     current.push(value);
-    showExpression(stack.join(''), current.join(''));
+    this.showExpression(stack.join(''), current.join(''));
   };
   
-  Calculator.prototype.clearExpression = function(stack, current, showExpression) {
+  Calculator.prototype.clearExpression = function() {
+    var stack = this.stack,
+      current = this.current;
     stack.length = 0;
     current.length = 0;
-    showExpression(stack.join(''), current.join(''));
+    this.showExpression(stack.join(''), current.join(''));
   };
 
   Calculator.prototype.infixToPostfix = function(expression) {
@@ -158,10 +171,10 @@
           operatorStack.push(expression[i]);
           flag = false;
         } else {
-          operatorStack.push(expression[i].replace(',', ''));
+          operatorStack.push(expression[i]);
         }
       } else {
-        resultStack.push(expression[i].replace(',', ''));
+        resultStack.push(expression[i]);
       }
     }
   
@@ -195,12 +208,12 @@
         resultStack.push(postfixExpression[i]);
       }
     }
-    
+
     return resultStack[0];
   };
 
   Calculator.prototype.minimizeToggle = function() {
-    var container = document.getElementById(this.containerId),
+    var container = document.getElementById(this.getContainerId()),
       className = '';
     className = container.className;
     if (className.indexOf('minimized') > -1) {
